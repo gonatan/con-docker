@@ -1,0 +1,11 @@
+{
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "git@https://github.com/CONTENIDO/CONTENIDO.git"
+        }
+    ],
+    "require": {
+        "CONTENIDO/CONTENIDO": "4.10.1"
+    }
+}

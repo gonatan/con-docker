@@ -1,0 +1,58 @@
+version: '3.5'
+
+services:
+
+  apache:
+    build:
+      context: .docker/apache
+      args:
+        PROJECT_WORKDIR: ${PROJECT_WORKDIR}
+    container_name: con_apache
+    ports:
+      - ${PORT_APACHE}:80
+    volumes:
+      - ./var/logs/apache/:/var/log/apache
+      - ./.docker/apache/conf/httpd.conf:/usr/local/apache2/conf/httpd.conf
+      - ./.docker/apache/conf/httpd-vhosts.conf:/usr/local/apache2/conf/extra/httpd-vhosts.conf
+      - ${PROJECT_PATH}:${PROJECT_WORKDIR}:cached
+    links:
+      - php
+    env_file: .env
+
+  php:
+    build:
+      context: .docker/php
+      args:
+        PROJECT_WORKDIR: ${PROJECT_WORKDIR}
+        USER_ID: ${USER_ID}
+        GROUP_ID: ${GROUP_ID}
+        PHP_INI: ${PHP_INI}
+    container_name: con_php
+    user: "${USER_ID}:${GROUP_ID}"
+    volumes:
+      - ${PROJECT_PATH}:${PROJECT_WORKDIR}:cached
+    links:
+      - mysql
+    env_file: .env
+
+  mysql:
+    build:
+      context: .docker/mysql
+    environment:
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    container_name: con_mysql
+    ports:
+      - ${PORT_MYSQL}:3306
+    volumes:
+      - ./var/data/mysql:/var/lib/mysql:cached
+    command:
+      - --sql-mode=NO_ENGINE_SUBSTITUTION
+
+  mailcatcher:
+    image: schickling/mailcatcher
+    container_name: con_mailcatcher
+    ports:
+      - ${PORT_MAILCATCHER}:1080
