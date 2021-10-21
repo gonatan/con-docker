@@ -1,6 +1,8 @@
 # con-docker
 A Docker environment for CONTENIDO.
 
+    This work is in progress!
+
 ## Requirements
 * Git
 * Docker
